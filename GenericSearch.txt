@@ -1,0 +1,142 @@
+// u - undiscovered                        -set (multime)-
+// v - discovered but not analyzed         -set (multime)-
+// w - discovered and completely analyzed  -set (multime)- 
+// N - all nodes                           -set (multime)-
+// A - all arcs                            -set (multime)-
+
+// p[x] - predecessor of x              -array-
+// o[x] - order of x                    -array-
+// we discovered the node x at the iteration k
+// s - starting node
+
+// Generic Search: line 16
+// Generic Complete Search: line 66
+// Path: line 123
+
+------ GENERIC SEARCH ------
+// doesn't specify any rule of selecting a discovered but not analyzed node x to continue the search
+
+genericSearchAlg
+{
+    // we discover the starting node
+    v.add(s);  
+    // all other nodes are undiscovered
+    u.add(N);
+    u.remove(s);
+
+    // initializations
+    w <- Ø;
+    k <- 1;
+    o[s] = k; // we discover the node s at iteration k
+
+    for (x in N) 
+        p[x] <- 0;
+
+    for (x in u)
+        o[x] <- 0;
+    
+    while (!v.isEmpty())
+    {   
+        // select a node x that we discovered
+        [ select a node x from v ]
+    
+        // if the arc (x,y) exists and y is undiscovered
+        if ( (x,y) in A & y in u )
+        {   
+            v.add(y);   // we visit the node y
+            u.remove(y);   
+            p[y] <- x;  // predecessor of y is x
+            k++;
+            o[y] <- k;  // we discovered y at iteration k
+        
+        } else
+        {
+            // node x becomes discovered and completely analyzed
+            v.remove(x);   
+            w.add(x);
+        }
+    }
+}
+
+// at the end 
+// w will have all accesible nodes from s
+// u will have all unaccesible nodes from s
+------------------------------------------------------------------------------
+
+------ GENERIC COMPLETE SEARCH ------
+genericCompleteSearch
+{
+    // we visit the starting node
+    v.add(s);  
+    // all other nodes are undiscovered
+    u.add(N);
+    u.remove(s);
+    
+    // initializations
+    w <- Ø;
+    k <- 1;
+    o[s] = k; // we discovered the node s at the k iteration
+
+    for (x in N) 
+        p[x] <- 0;
+
+    for (x in u)
+        o[x] <- 0;
+        
+    while (w ≠ N) // while tere are still nodes not completely analyzed
+    {
+        while (!v.isEmpty()) // while there are no more discovered nodes we can acces
+        {   
+            // select a node x that we discovered
+            [ select a node x from v ]
+    
+            // if the arc (x,y) exists and y is undiscovered
+            if ( (x,y) in A & y in u )
+            {   
+                v.add(y);   // we visit the node y
+                u.remove(y);   
+                p[y] <- x;  // predecessor of y is x
+                k++;
+                o[y] <- k;  // we discovered y at iteration k
+        
+            } else
+            {
+                // node x becomes discovered and completely analyzed
+                v.remove(x);   
+                w.add(x);
+            }
+        }
+      
+        if (!u.isEmpty())  // there are still undiscovered nodes
+        {
+        // we select a new starting node and start again
+        [ select a new starting node from u ]
+        v.add(s);
+        u.remove(s);
+        k++;
+        o[s] <- k;
+        }
+    }    
+} 
+------------------------------------------------------------------------------
+
+------ PATH ------
+// to determine the path along which node y was wisited we use
+    // we recursively call path(starting node, predecessor[y])
+    // until we reach node s
+    
+path(s, y)
+{
+    if(y == s) // we reached the starting node 
+    {
+        write s;
+    } else if(p[y] == 0) // node y has no predecessor 
+      {
+        write "there is no path from s to y";
+      } else
+        {
+            write y;
+            path(s, p[y]);
+    }
+}
+------------------------------------------------------------------------------
